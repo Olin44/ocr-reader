@@ -3,9 +3,8 @@ package pl.olin44.ocrreader.ocr.text_recognition;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.stereotype.Service;
-import pl.olin44.ocrreader.ocr.text_recognition.ErrorWhileProcessingImageException;
 
-import java.nio.file.Path;
+import java.awt.image.BufferedImage;
 
 @Service
 public class TextRecognizer {
@@ -16,12 +15,11 @@ public class TextRecognizer {
         this.tesseract = tesseract;
     }
 
-    public String getTextFromImage(Path path) {
+    public String getTextFromImage(BufferedImage bufferedImage) {
         try {
-            return tesseract.doOCR(path.toFile());
+            return tesseract.doOCR(bufferedImage);
         } catch (TesseractException tesseractException) {
-            throw new ErrorWhileProcessingImageException("Error while processing image: " + path.getFileName(),
-                    tesseractException);
+            throw new ErrorWhileProcessingImageException("Error while processing image", tesseractException);
         }
     }
 }
