@@ -1,9 +1,10 @@
 package pl.olin44.ocrreader.ocr.pdf;
 
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import pl.olin44.ocrreader.ocr.UnsupportedDataTypeException;
+import pl.olin44.ocrreader.ocr.common.BufferedImageReader;
+import pl.olin44.ocrreader.ocr.common.ExtensionResolver;
+import pl.olin44.ocrreader.ocr.common.UnsupportedDataTypeException;
 import pl.olin44.ocrreader.ocr.text_recognition.TextRecognizer;
 
 import java.awt.image.BufferedImage;
@@ -32,7 +33,7 @@ public class TextFromPdfRecognizerService {
 
     private String readAllPages(MultipartFile multipartFile) {
         return bufferedImageReader.read(multipartFile).stream()
-                .map(textRecognizer::getTextFromImage)
+                .map(textRecognizer::recognize)
                 .collect(Collectors.joining("\n"));
     }
 
@@ -45,18 +46,13 @@ public class TextFromPdfRecognizerService {
     }
 
     private void validateExtension(MultipartFile multipartFile) {
-        String extension = getFileExtension(multipartFile);
-        if (!Objects.equals(extension, PDF_EXTENSION)) {
+        if (!Objects.equals(ExtensionResolver.resolve(multipartFile), PDF_EXTENSION)) {
             throw new UnsupportedDataTypeException();
         }
     }
 
-    private String getFileExtension(MultipartFile multipartFile) {
-        return FilenameUtils.getExtension(multipartFile.getOriginalFilename());
-    }
-
     private String readFromPage(MultipartFile multipartFile, Integer pageNumber) {
         BufferedImage bufferedImage = bufferedImageReader.read(multipartFile, pageNumber);
-        return textRecognizer.getTextFromImage(bufferedImage);
+        return textRecognizer.recognize(bufferedImage);
     }
 }

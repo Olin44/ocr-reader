@@ -15,7 +15,7 @@ public class TextRecognizer {
         this.tesseract = tesseract;
     }
 
-    public String getTextFromImage(BufferedImage bufferedImage) {
+    public String recognize(BufferedImage bufferedImage) {
         try {
             return tesseract.doOCR(bufferedImage);
         } catch (TesseractException tesseractException) {
